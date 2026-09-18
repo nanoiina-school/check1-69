@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบตรวจสอบการส่งงาน ครูอัจฉราพร</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-color: #f5f5f7;
+      --card-bg: rgba(255, 255, 255, 0.82);
+      --card-border: rgba(255, 255, 255, 0.5);
+      --text-main: #1d1d1f;
+      --text-secondary: #86868b;
+      --accent: #0071e3;
+      --success-bg: #e8f8ee;
+      --success-color: #1d874b;
+      --danger-bg: #ffebeb;
+      --danger-color: #e11d48;
+      --radius: 18px;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); padding: 20px 12px 60px 12px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .container { width: 100%; max-width: 860px; }
+    header { text-align: center; margin-bottom: 28px; padding: 24px; background: var(--card-bg); backdrop-filter: blur(20px); border-radius: var(--radius); border: 1px solid var(--card-border); box-shadow: var(--shadow); }
+    .header-badge { display: inline-block; padding: 4px 14px; background: rgba(0, 113, 227, 0.1); color: var(--accent); border-radius: 20px; font-size: 0.85rem; font-weight: 500; margin-bottom: 8px; }
+    header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 6px; }
+    header p { color: var(--text-secondary); font-size: 0.95rem; }
+    
+    .filter-card { background: var(--card-bg); backdrop-filter: blur(20px); border-radius: var(--radius); border: 1px solid var(--card-border); padding: 24px; box-shadow: var(--shadow); margin-bottom: 24px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 8px; }
+    select { width: 100%; padding: 14px 16px; font-size: 1rem; border-radius: 12px; border: 1px solid #d2d2d7; background: rgba(255, 255, 255, 0.9); outline: none; appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2086868b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; }
+    select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); }
+    select:disabled { background-color: #f0f0f2; color: #a1a1a6; cursor: not-allowed; }
+
+    .result-container { display: none; }
+    .student-card { background: linear-gradient(135deg, #0071e3, #42a5f5); color: white; border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0, 113, 227, 0.25); }
+    .student-info h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 6px; }
+    .status-summary { display: flex; gap: 12px; margin-top: 16px; }
+    .summary-badge { background: rgba(255, 255, 255, 0.2); padding: 6px 14px; border-radius: 12px; font-size: 0.85rem; }
+
+    .score-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .score-card { background: var(--card-bg); backdrop-filter: blur(20px); border-radius: 14px; border: 1px solid var(--card-border); padding: 18px; box-shadow: var(--shadow); }
+    .item-title { font-size: 0.95rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 12px; }
+    .value-badge { font-size: 1.1rem; font-weight: 600; padding: 6px 14px; border-radius: 10px; display: inline-flex; align-items: center; gap: 6px; }
+    .badge-success { background: var(--success-bg); color: var(--success-color); }
+    .badge-danger { background: var(--danger-bg); color: var(--danger-color); }
+    .badge-neutral { background: #f2f2f7; color: var(--text-main); }
+
+    .loading-overlay { display: none; text-align: center; padding: 30px; }
+    .spinner { width: 36px; height: 36px; border: 3px solid rgba(0, 113, 227, 0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    footer { text-align: center; margin-top: 40px; color: var(--text-secondary); font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <span class="header-badge"><i class="fa-solid fa-graduation-cap"></i> GitHub Pages + Google Sheets Sync</span>
+      <h1>ระบบตรวจสอบการส่งงาน ครูอัจฉราพร</h1>
+      <p>เลือกวิชา ชั้นเรียน และชื่อนักเรียน เพื่อดูผลการเรียนและการส่งงานแบบ Realtime</p>
+    </header>
+
+    <div class="filter-card">
+      <div class="form-group">
+        <label for="subjectSelect"><i class="fa-solid fa-book"></i> 1. เลือกรายวิชา</label>
+        <select id="subjectSelect" onchange="onSubjectChange()">
+          <option value="">-- กำลังโหลด รายวิชา... --</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="classSelect"><i class="fa-solid fa-users"></i> 2. เลือกชั้นเรียน</label>
+        <select id="classSelect" onchange="onClassChange()" disabled>
+          <option value="">-- กรุณาเลือกรายวิชาก่อน --</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="studentSelect"><i class="fa-solid fa-user"></i> 3. เลือกชื่อนักเรียน</label>
+        <select id="studentSelect" onchange="onStudentChange()" disabled>
+          <option value="">-- กรุณาเลือกชั้นเรียนก่อน --</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="loading" class="loading-overlay">
+      <div class="spinner"></div>
+      <p style="color: var(--text-secondary); font-size: 0.9rem;">กำลังดึงข้อมูล Realtime จาก Google Sheet...</p>
+    </div>
+
+    <div id="resultContainer" class="result-container">
+      <div class="student-card">
+        <div class="student-info">
+          <h2 id="studentName">ชื่อ-นามสกุล</h2>
+          <p id="studentDetails">วิชา: - | ชั้น: -</p>
+        </div>
+        <div class="status-summary" id="statusSummary"></div>
+      </div>
+
+      <div class="score-list" id="scoreList"></div>
+    </div>
+
+    <footer>
+      <p>© ระบบตรวจสอบการส่งงาน ครูอัจฉราพร | Hosted on GitHub Pages</p>
+    </footer>
+  </div>
+
+  <script>
+    // ⚠️ วาง Web App URL จาก Google Apps Script ตรงนี้ ⚠️
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwqTI9Z1GrFVGgDaDcN_zfR3y7hQhWkNU22bx8NmEWbronBkhAEOGG684x7f-qW-XGl/exec';
+
+    let rawSheetData = null;
+    let nameColIndex = 1;
+
+    window.onload = function() {
+      fetch(`${GAS_API_URL}?action=getSubjects`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success') {
+            populateSubjects(res.data);
+          } else {
+            showError(res.message);
+          }
+        })
+        .catch(showError);
+    };
+
+    function populateSubjects(subjects) {
+      const subjectSelect = document.getElementById('subjectSelect');
+      subjectSelect.innerHTML = '<option value="">-- เลือกรายวิชา --</option>';
+      subjects.forEach(sub => {
+        const opt = document.createElement('option');
+        opt.value = sub;
+        opt.textContent = sub;
+        subjectSelect.appendChild(opt);
+      });
+    }
+
+    function onSubjectChange() {
+      const subject = document.getElementById('subjectSelect').value;
+      const classSelect = document.getElementById('classSelect');
+      const studentSelect = document.getElementById('studentSelect');
+      const resultContainer = document.getElementById('resultContainer');
+
+      classSelect.disabled = true;
+      studentSelect.disabled = true;
+      classSelect.innerHTML = '<option value="">-- กรุณาเลือกรายวิชาก่อน --</option>';
+      studentSelect.innerHTML = '<option value="">-- กรุณาเลือกชั้นเรียนก่อน --</option>';
+      resultContainer.style.display = 'none';
+
+      if (!subject) return;
+
+      showLoading(true);
+
+      fetch(`${GAS_API_URL}?action=getData&sheet=${encodeURIComponent(subject)}`)
+        .then(res => res.json())
+        .then(res => {
+          showLoading(false);
+          if (res.status === 'success' && res.data) {
+            rawSheetData = res.data;
+            detectNameColumn(res.data.headers);
+            populateClasses(res.data.rows);
+          } else {
+            alert('ไม่พบข้อมูลในรายวิชานี้');
+          }
+        })
+        .catch(err => {
+          showLoading(false);
+          showError(err);
+        });
+    }
+
+    function detectNameColumn(headers) {
+      nameColIndex = 1;
+      for (let i = 0; i < headers.length; i++) {
+        const h = headers[i].toString().trim();
+        if (h.includes('ชื่อ') || h.includes('นามสกุล') || h.includes('นักเรียน')) {
+          nameColIndex = i;
+          break;
+        }
+      }
+    }
+
+    function populateClasses(rows) {
+      const classSelect = document.getElementById('classSelect');
+      const uniqueClasses = new Set();
+
+      rows.forEach(row => {
+        const className = row[0] ? row[0].toString().trim() : '';
+        if (className) uniqueClasses.add(className);
+      });
+
+      classSelect.innerHTML = '<option value="">-- เลือกชั้นเรียน --</option>';
+      uniqueClasses.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = 'ชั้น ' + c;
+        classSelect.appendChild(opt);
+      });
+
+      classSelect.disabled = false;
+    }
+
+    function onClassChange() {
+      const selectedClass = document.getElementById('classSelect').value;
+      const studentSelect = document.getElementById('studentSelect');
+      const resultContainer = document.getElementById('resultContainer');
+
+      studentSelect.disabled = true;
+      resultContainer.style.display = 'none';
+
+      if (!selectedClass || !rawSheetData) return;
+
+      studentSelect.innerHTML = '<option value="">-- เลือกชื่อนักเรียน --</option>';
+
+      rawSheetData.rows.forEach((row, index) => {
+        const rowClass = row[0] ? row[0].toString().trim() : '';
+        if (rowClass === selectedClass) {
+          const studentName = row[nameColIndex] ? row[nameColIndex].toString().trim() : 'ไม่มีชื่อ';
+          const opt = document.createElement('option');
+          opt.value = index;
+          opt.textContent = studentName;
+          studentSelect.appendChild(opt);
+        }
+      });
+
+      studentSelect.disabled = false;
+    }
+
+    function onStudentChange() {
+      const rowIndex = document.getElementById('studentSelect').value;
+      const resultContainer = document.getElementById('resultContainer');
+
+      if (rowIndex === "" || !rawSheetData) {
+        resultContainer.style.display = 'none';
+        return;
+      }
+
+      const headers = rawSheetData.headers;
+      const studentRow = rawSheetData.rows[rowIndex];
+
+      const studentName = studentRow[nameColIndex] ? studentRow[nameColIndex].toString().trim() : '-';
+      const studentClass = studentRow[0] ? studentRow[0].toString().trim() : '-';
+      const subjectName = document.getElementById('subjectSelect').value;
+
+      document.getElementById('studentName').textContent = studentName;
+      document.getElementById('studentDetails').textContent = `รายวิชา: ${subjectName} | ชั้น ${studentClass}`;
+
+      const scoreList = document.getElementById('scoreList');
+      scoreList.innerHTML = '';
+
+      let totalItems = 0;
+
+      for (let col = nameColIndex + 1; col < headers.length; col++) {
+        const headerTitle = headers[col] ? headers[col].toString().trim() : `หัวข้อที่ ${col - nameColIndex}`;
+        const rawValue = studentRow[col] ? studentRow[col].toString().trim() : '-';
+
+        totalItems++;
+        const badgeClass = getBadgeClass(rawValue);
+
+        const card = document.createElement('div');
+        card.className = 'score-card';
+        card.innerHTML = `
+          <div class="item-title">${headerTitle}</div>
+          <div class="item-value-box">
+            <span class="value-badge ${badgeClass}">${formatDisplayValue(rawValue)}</span>
+          </div>
+        `;
+        scoreList.appendChild(card);
+      }
+
+      document.getElementById('statusSummary').innerHTML = `
+        <div class="summary-badge"><i class="fa-solid fa-list-check"></i> งานทั้งหมด: ${totalItems} รายการ</div>
+      `;
+
+      resultContainer.style.display = 'block';
+    }
+
+    function getBadgeClass(val) {
+      const lower = val.toLowerCase();
+      if (['ส่งแล้ว', 'เรียบร้อย', 'ครบ', 'pass', '1', '✓', 'ผ่าน'].includes(lower)) return 'badge-success';
+      if (['ยังไม่ส่ง', 'ขาด', 'ยังไม่ทำ', '0', '✗', 'ไม่ผ่าน', 'ค้าง'].includes(lower)) return 'badge-danger';
+      return 'badge-neutral';
+    }
+
+    function formatDisplayValue(val) {
+      if (val === '1' || val === '✓') return '<i class="fa-solid fa-check"></i> ส่งแล้ว';
+      if (val === '0' || val === '✗') return '<i class="fa-solid fa-xmark"></i> ยังไม่ส่ง';
+      return val || '-';
+    }
+
+    function showLoading(show) {
+      document.getElementById('loading').style.display = show ? 'block' : 'none';
+    }
+
+    function showError(err) {
+      alert('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + (err.message || err));
+    }
+  </script>
+</body>
+</html>
