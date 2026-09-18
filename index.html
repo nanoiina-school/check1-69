@@ -12,50 +12,60 @@
   <style>
     :root {
       --bg-color: #f5f5f7;
-      --card-bg: rgba(255, 255, 255, 0.82);
-      --card-border: rgba(255, 255, 255, 0.5);
+      --card-bg: rgba(255, 255, 255, 0.88);
+      --card-border: rgba(255, 255, 255, 0.6);
       --text-main: #1d1d1f;
-      --text-secondary: #86868b;
+      --text-secondary: #6e6e73;
       --accent: #0071e3;
-      --success-bg: #e8f8ee;
-      --success-color: #1d874b;
-      --danger-bg: #ffebeb;
-      --danger-color: #e11d48;
+      --success-bg: #e6f4ea;
+      --success-color: #137333;
+      --success-border: rgba(19, 115, 51, 0.2);
+      --danger-bg: #fce8e6;
+      --danger-color: #c5221f;
+      --danger-border: rgba(197, 34, 31, 0.2);
+      --neutral-bg: #f1f3f4;
+      --neutral-color: #3c4043;
       --radius: 18px;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', -apple-system, sans-serif; }
     body { background-color: var(--bg-color); color: var(--text-main); padding: 20px 12px 60px 12px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
     .container { width: 100%; max-width: 860px; }
-    header { text-align: center; margin-bottom: 28px; padding: 24px; background: var(--card-bg); backdrop-filter: blur(20px); border-radius: var(--radius); border: 1px solid var(--card-border); box-shadow: var(--shadow); }
+    
+    header { text-align: center; margin-bottom: 24px; padding: 24px 20px; background: var(--card-bg); backdrop-filter: blur(20px); border-radius: var(--radius); border: 1px solid var(--card-border); box-shadow: var(--shadow); }
     .header-badge { display: inline-block; padding: 4px 14px; background: rgba(0, 113, 227, 0.1); color: var(--accent); border-radius: 20px; font-size: 0.85rem; font-weight: 500; margin-bottom: 8px; }
-    header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 6px; }
-    header p { color: var(--text-secondary); font-size: 0.95rem; }
+    header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px; }
+    header p { color: var(--text-secondary); font-size: 0.95rem; margin-top: 4px; }
     
     .filter-card { background: var(--card-bg); backdrop-filter: blur(20px); border-radius: var(--radius); border: 1px solid var(--card-border); padding: 24px; box-shadow: var(--shadow); margin-bottom: 24px; }
     .form-group { margin-bottom: 18px; }
     .form-group:last-child { margin-bottom: 0; }
-    label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 8px; }
+    label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
     select { width: 100%; padding: 14px 16px; font-size: 1rem; border-radius: 12px; border: 1px solid #d2d2d7; background: rgba(255, 255, 255, 0.9); outline: none; appearance: none;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2086868b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; }
+      background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; transition: all 0.2s ease; }
     select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); }
     select:disabled { background-color: #f0f0f2; color: #a1a1a6; cursor: not-allowed; }
 
-    .result-container { display: none; }
-    .student-card { background: linear-gradient(135deg, #0071e3, #42a5f5); color: white; border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0, 113, 227, 0.25); }
-    .student-info h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 6px; }
-    .status-summary { display: flex; gap: 12px; margin-top: 16px; }
-    .summary-badge { background: rgba(255, 255, 255, 0.2); padding: 6px 14px; border-radius: 12px; font-size: 0.85rem; }
+    .result-container { display: none; animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    .score-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-    .score-card { background: var(--card-bg); backdrop-filter: blur(20px); border-radius: 14px; border: 1px solid var(--card-border); padding: 18px; box-shadow: var(--shadow); }
-    .item-title { font-size: 0.95rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 12px; }
-    .value-badge { font-size: 1.1rem; font-weight: 600; padding: 6px 14px; border-radius: 10px; display: inline-flex; align-items: center; gap: 6px; }
-    .badge-success { background: var(--success-bg); color: var(--success-color); }
-    .badge-danger { background: var(--danger-bg); color: var(--danger-color); }
-    .badge-neutral { background: #f2f2f7; color: var(--text-main); }
+    .student-card { background: linear-gradient(135deg, #0071e3, #3a92ee); color: white; border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0, 113, 227, 0.22); }
+    .student-info h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+    .student-info p { font-size: 0.95rem; opacity: 0.9; }
+    .status-summary { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .summary-badge { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 6px 14px; border-radius: 12px; font-size: 0.85rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+
+    .score-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+    .score-card { background: var(--card-bg); backdrop-filter: blur(20px); border-radius: 16px; border: 1px solid var(--card-border); padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: space-between; gap: 12px; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .score-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,0.07); }
+    .item-title { font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    .value-badge { font-size: 1rem; font-weight: 600; padding: 10px 16px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; text-align: center; }
+    .badge-success { background: var(--success-bg); color: var(--success-color); border: 1px solid var(--success-border); }
+    .badge-danger { background: var(--danger-bg); color: var(--danger-color); border: 1px solid var(--danger-border); }
+    .badge-neutral { background: var(--neutral-bg); color: var(--neutral-color); border: 1px solid rgba(0,0,0,0.08); }
 
     .loading-overlay { display: none; text-align: center; padding: 30px; }
     .spinner { width: 36px; height: 36px; border: 3px solid rgba(0, 113, 227, 0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px auto; }
@@ -67,9 +77,9 @@
 
   <div class="container">
     <header>
-      <span class="header-badge"><i class="fa-solid fa-graduation-cap"></i> GitHub Pages + Google Sheets Sync</span>
+      <span class="header-badge"><i class="fa-solid fa-graduation-cap"></i> Dynamic Realtime Sync</span>
       <h1>ระบบตรวจสอบการส่งงาน ครูอัจฉราพร</h1>
-      <p>เลือกวิชา ชั้นเรียน และชื่อนักเรียน เพื่อดูผลการเรียนและการส่งงานแบบ Realtime</p>
+      <p>เลือกวิชา ชั้นเรียน และชื่อนักเรียน เพื่อดูผลการเรียนและการส่งงาน</p>
     </header>
 
     <div class="filter-card">
@@ -118,8 +128,8 @@
   </div>
 
   <script>
-    // ⚠️ วาง Web App URL จาก Google Apps Script ตรงนี้ ⚠️
-    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwsb6ca2KOwDXztl-4TzJf9s0lTuQk1m_ZdC4KsTMO4UKGppWvOz2bkb0jUVBYDRko3/exec';
+    // ⚠️ อย่าลืมใส่ Web App URL ของคุณตรงนี้ ⚠️
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbw8eo1uf0IpRkt6pcCRs8hWoWvw5ZJeNn8tiPdcAC478O4sp_R2moaJ95ha0MZp0kP7/exec';
 
     let rawSheetData = null;
     let nameColIndex = 1;
@@ -262,43 +272,68 @@
       scoreList.innerHTML = '';
 
       let totalItems = 0;
+      let completedItems = 0;
+      let pendingItems = 0;
 
       for (let col = nameColIndex + 1; col < headers.length; col++) {
-        const headerTitle = headers[col] ? headers[col].toString().trim() : `หัวข้อที่ ${col - nameColIndex}`;
+        const headerTitle = headers[col] ? headers[col].toString().trim() : `งานที่ ${col - nameColIndex}`;
         const rawValue = studentRow[col] ? studentRow[col].toString().trim() : '-';
 
         totalItems++;
         const badgeClass = getBadgeClass(rawValue);
 
+        if (badgeClass === 'badge-success') completedItems++;
+        if (badgeClass === 'badge-danger') pendingItems++;
+
         const card = document.createElement('div');
         card.className = 'score-card';
         card.innerHTML = `
           <div class="item-title">${headerTitle}</div>
-          <div class="item-value-box">
+          <div>
             <span class="value-badge ${badgeClass}">${formatDisplayValue(rawValue)}</span>
           </div>
         `;
         scoreList.appendChild(card);
       }
 
+      // สรุปยอดด้านบน
       document.getElementById('statusSummary').innerHTML = `
         <div class="summary-badge"><i class="fa-solid fa-list-check"></i> งานทั้งหมด: ${totalItems} รายการ</div>
+        <div class="summary-badge" style="background: rgba(46, 204, 113, 0.25);"><i class="fa-solid fa-circle-check"></i> ส่งแล้ว: ${completedItems}</div>
+        <div class="summary-badge" style="background: rgba(231, 76, 60, 0.25);"><i class="fa-solid fa-circle-xmark"></i> ยังไม่ส่ง: ${pendingItems}</div>
       `;
 
       resultContainer.style.display = 'block';
     }
 
+    // ฟังก์ชันจัดกลุ่มประเภทสถานะ
     function getBadgeClass(val) {
-      const lower = val.toLowerCase();
-      if (['ส่งแล้ว', 'เรียบร้อย', 'ครบ', 'pass', '1', '✓', 'ผ่าน'].includes(lower)) return 'badge-success';
-      if (['ยังไม่ส่ง', 'ขาด', 'ยังไม่ทำ', '0', '✗', 'ไม่ผ่าน', 'ค้าง'].includes(lower)) return 'badge-danger';
+      if (!val) return 'badge-neutral';
+      const str = val.toString().trim().toLowerCase();
+      
+      // กรณี True, ส่งแล้ว, ผ่าน, 1
+      if (['true', 'ส่งแล้ว', 'เรียบร้อย', 'ครบ', 'pass', '1', '✓', 'ผ่าน'].includes(str)) {
+        return 'badge-success';
+      }
+      // กรณี False, ยังไม่ส่ง, ขาด, 0
+      if (['false', 'ยังไม่ส่ง', 'ขาด', 'ยังไม่ทำ', '0', '✗', 'ไม่ผ่าน', 'ค้าง'].includes(str)) {
+        return 'badge-danger';
+      }
       return 'badge-neutral';
     }
 
+    // ฟังก์ชันแปลงข้อความใส่ ไอคอน + ปรับคำพูด
     function formatDisplayValue(val) {
-      if (val === '1' || val === '✓') return '<i class="fa-solid fa-check"></i> ส่งแล้ว';
-      if (val === '0' || val === '✗') return '<i class="fa-solid fa-xmark"></i> ยังไม่ส่ง';
-      return val || '-';
+      if (!val) return '-';
+      const str = val.toString().trim().toLowerCase();
+
+      if (['true', '1', '✓', 'ส่งแล้ว', 'pass', 'เรียบร้อย', 'ผ่าน'].includes(str)) {
+        return '<i class="fa-solid fa-circle-check"></i> ส่งแล้ว';
+      }
+      if (['false', '0', '✗', 'ยังไม่ส่ง', 'ไม่ผ่าน', 'ขาด', 'ยังไม่ทำ'].includes(str)) {
+        return '<i class="fa-solid fa-circle-xmark"></i> ยังไม่ส่ง';
+      }
+      return `<i class="fa-solid fa-star"></i> ${val}`;
     }
 
     function showLoading(show) {
